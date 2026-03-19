@@ -7,7 +7,7 @@ import dts from "vite-plugin-dts";
 
 export default defineConfig({
   plugins: [
-    dts(),
+    dts({ include: ["src"], exclude: ["**/*.spec.ts"], rollupTypes: true }),
   ],
   build: {
     outDir: "dist",
