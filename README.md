@@ -143,6 +143,23 @@ const sentences = splitIntoSentences("First sentence. Second sentence.");
 // [{ index: 1, text: "First sentence.", start: 0, end: 16 }, ...]
 ```
 
+## Example Results
+
+Pre-generated segmentation results for Akutagawa Ryunosuke's "Rashomon" (5,839 characters) are included in [`spec/fixtures/results/`](spec/fixtures/results/). Each JSON file contains the strategy name, configuration, and full segment list with position offsets and text previews.
+
+| Strategy | Segments | Avg Length | Config |
+|----------|----------|------------|--------|
+| [Punctuation](spec/fixtures/results/rashomon-punctuation.json) | 11 | 531 chars | target=500, min=100, max=2000 |
+| [Compression](spec/fixtures/results/rashomon-compression.json) | 11 | 531 chars | ncdThreshold=0.3, window=3 |
+| [TF-IDF](spec/fixtures/results/rashomon-tfidf.json) | 11 | 531 chars | tfidfThreshold=0.3, window=3 |
+| [NCD+TF-IDF](spec/fixtures/results/rashomon-ncd-tfidf.json) | 11 | 531 chars | ncdTfidfThreshold=0.3, window=3 |
+
+To regenerate these results:
+
+```bash
+bun spec/fixtures/generate-results.ts
+```
+
 ## How It Works
 
 The semantic strategies (Compression, TF-IDF, NCD+TF-IDF) share a common window-based algorithm:
