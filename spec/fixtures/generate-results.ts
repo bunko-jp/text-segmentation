@@ -17,12 +17,6 @@ const rashomonText = readFileSync(resolve(currentDir, "rashomon.txt"), "utf-8");
 const outDir = resolve(currentDir, "results");
 mkdirSync(outDir, { recursive: true });
 
-const config = {
-  targetChunkSize: 500,
-  minChunkSize: 100,
-  maxChunkSize: 2000,
-};
-
 type SegmentResult = {
   strategy: string;
   config: Record<string, unknown>;
@@ -66,23 +60,31 @@ function avgLength(points: Array<{ start: number; end: number }>): number {
   return Math.round(total / points.length);
 }
 
-// Punctuation
-const punctConfig = { ...config };
+// ============================================================
+// Punctuation: purely size-based, no semantic detection
+// ============================================================
+const punctConfig = { targetChunkSize: 500, minChunkSize: 100, maxChunkSize: 2000 };
 const punctResult = segmentByPunctuation(rashomonText, punctConfig);
 writeResult("rashomon-punctuation.json", buildResult("punctuation", punctConfig, punctResult));
 
-// Compression
-const compConfig = { ...config, ncdThreshold: 0.3, windowSize: 3 };
+// ============================================================
+// Semantic strategies: use adaptive mode with wide size range
+// to let semantic boundaries dominate over size constraints
+// ============================================================
+const semanticBase = { minChunkSize: 100, maxChunkSize: 3000 };
+
+// Compression (NCD)
+const compConfig = { ...semanticBase, adaptive: true, ncdPercentile: 0.25, windowSize: 3 };
 const compResult = segmentByCompression(rashomonText, compConfig);
 writeResult("rashomon-compression.json", buildResult("compression", compConfig, compResult));
 
 // TF-IDF
-const tfidfConfig = { ...config, tfidfThreshold: 0.3, windowSize: 3 };
+const tfidfConfig = { ...semanticBase, adaptive: true, tfidfPercentile: 0.25, windowSize: 3 };
 const tfidfResult = segmentByTfidf(rashomonText, tfidfConfig);
 writeResult("rashomon-tfidf.json", buildResult("tfidf", tfidfConfig, tfidfResult));
 
 // NCD+TF-IDF
-const ncdTfidfConfig = { ...config, ncdTfidfThreshold: 0.3, windowSize: 3, ncdWeight: 0.5, tfidfWeight: 0.5 };
+const ncdTfidfConfig = { ...semanticBase, adaptive: true, ncdTfidfPercentile: 0.25, windowSize: 3, ncdWeight: 0.5, tfidfWeight: 0.5 };
 const ncdTfidfResult = segmentByNcdTfidf(rashomonText, ncdTfidfConfig);
 writeResult("rashomon-ncd-tfidf.json", buildResult("ncd-tfidf", ncdTfidfConfig, ncdTfidfResult));
 
@@ -91,3 +93,9 @@ console.log(`  punctuation:  ${punctResult.length} segments, avg ${avgLength(pun
 console.log(`  compression:  ${compResult.length} segments, avg ${avgLength(compResult)} chars`);
 console.log(`  tfidf:        ${tfidfResult.length} segments, avg ${avgLength(tfidfResult)} chars`);
 console.log(`  ncd-tfidf:    ${ncdTfidfResult.length} segments, avg ${avgLength(ncdTfidfResult)} chars`);
+
+console.log("\nBoundary positions (end):");
+console.log(`  punctuation:  ${punctResult.map((p) => p.end).join(", ")}`);
+console.log(`  compression:  ${compResult.map((p) => p.end).join(", ")}`);
+console.log(`  tfidf:        ${tfidfResult.map((p) => p.end).join(", ")}`);
+console.log(`  ncd-tfidf:    ${ncdTfidfResult.map((p) => p.end).join(", ")}`);
