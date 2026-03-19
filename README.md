@@ -145,14 +145,16 @@ const sentences = splitIntoSentences("First sentence. Second sentence.");
 
 ## Example Results
 
-Pre-generated segmentation results for Akutagawa Ryunosuke's "Rashomon" (5,839 characters) are included in [`spec/fixtures/results/`](spec/fixtures/results/). Each JSON file contains the strategy name, configuration, and full segment list with position offsets and text previews.
+Pre-generated segmentation results for Akutagawa Ryunosuke's "Rashomon" (5,839 characters) are included in [`spec/fixtures/results/`](spec/fixtures/results/). Each JSON file contains the strategy name, configuration, and full segment list with positions and full text content.
 
-| Strategy | Segments | Avg Length | Config |
-|----------|----------|------------|--------|
-| [Punctuation](spec/fixtures/results/rashomon-punctuation.json) | 11 | 531 chars | target=500, min=100, max=2000 |
-| [Compression](spec/fixtures/results/rashomon-compression.json) | 11 | 531 chars | ncdThreshold=0.3, window=3 |
-| [TF-IDF](spec/fixtures/results/rashomon-tfidf.json) | 11 | 531 chars | tfidfThreshold=0.3, window=3 |
-| [NCD+TF-IDF](spec/fixtures/results/rashomon-ncd-tfidf.json) | 11 | 531 chars | ncdTfidfThreshold=0.3, window=3 |
+All four strategies produce 11 segments with `targetChunkSize=500`, but their **boundary positions differ** — each strategy detects topic shifts at different points in the text.
+
+| Strategy | Result | Boundaries (end positions) |
+|----------|--------|----------------------------|
+| [Punctuation](spec/fixtures/results/rashomon-punctuation.json) | 11 segments | 506, 1030, 1591, 2101, 2645, 3173, 3700, 4214, 4962, 5489 |
+| [Compression](spec/fixtures/results/rashomon-compression.json) | 11 segments | 551, 1106, 1621, 2348, 2926, 3553, 4130, 4702, 5248, 5820 |
+| [TF-IDF](spec/fixtures/results/rashomon-tfidf.json) | 11 segments | 506, 1030, 1621, 2300, 2882, 3553, 4130, 4702, 5248, 5820 |
+| [NCD+TF-IDF](spec/fixtures/results/rashomon-ncd-tfidf.json) | 11 segments | 506, 1030, 1621, 2300, 2882, 3553, 4130, 4702, 5248, 5820 |
 
 To regenerate these results:
 

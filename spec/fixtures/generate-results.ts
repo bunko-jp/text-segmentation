@@ -33,7 +33,7 @@ type SegmentResult = {
     start: number;
     end: number;
     length: number;
-    preview: string;
+    text: string;
   }>;
 };
 
@@ -52,45 +52,42 @@ function buildResult(
       start: p.start,
       end: p.end,
       length: p.end - p.start,
-      preview: rashomonText.slice(p.start, Math.min(p.start + 60, p.end)).replace(/\n/g, "\\n") + (p.end - p.start > 60 ? "..." : ""),
+      text: rashomonText.slice(p.start, p.end),
     })),
   };
+}
+
+function writeResult(filename: string, result: SegmentResult): void {
+  writeFileSync(resolve(outDir, filename), JSON.stringify(result, null, 2) + "\n");
+}
+
+function avgLength(points: Array<{ start: number; end: number }>): number {
+  const total = points.reduce((sum, p) => sum + (p.end - p.start), 0);
+  return Math.round(total / points.length);
 }
 
 // Punctuation
 const punctConfig = { ...config };
 const punctResult = segmentByPunctuation(rashomonText, punctConfig);
-writeFileSync(
-  resolve(outDir, "rashomon-punctuation.json"),
-  JSON.stringify(buildResult("punctuation", punctConfig, punctResult), null, 2) + "\n"
-);
+writeResult("rashomon-punctuation.json", buildResult("punctuation", punctConfig, punctResult));
 
 // Compression
 const compConfig = { ...config, ncdThreshold: 0.3, windowSize: 3 };
 const compResult = segmentByCompression(rashomonText, compConfig);
-writeFileSync(
-  resolve(outDir, "rashomon-compression.json"),
-  JSON.stringify(buildResult("compression", compConfig, compResult), null, 2) + "\n"
-);
+writeResult("rashomon-compression.json", buildResult("compression", compConfig, compResult));
 
 // TF-IDF
 const tfidfConfig = { ...config, tfidfThreshold: 0.3, windowSize: 3 };
 const tfidfResult = segmentByTfidf(rashomonText, tfidfConfig);
-writeFileSync(
-  resolve(outDir, "rashomon-tfidf.json"),
-  JSON.stringify(buildResult("tfidf", tfidfConfig, tfidfResult), null, 2) + "\n"
-);
+writeResult("rashomon-tfidf.json", buildResult("tfidf", tfidfConfig, tfidfResult));
 
 // NCD+TF-IDF
 const ncdTfidfConfig = { ...config, ncdTfidfThreshold: 0.3, windowSize: 3, ncdWeight: 0.5, tfidfWeight: 0.5 };
 const ncdTfidfResult = segmentByNcdTfidf(rashomonText, ncdTfidfConfig);
-writeFileSync(
-  resolve(outDir, "rashomon-ncd-tfidf.json"),
-  JSON.stringify(buildResult("ncd-tfidf", ncdTfidfConfig, ncdTfidfResult), null, 2) + "\n"
-);
+writeResult("rashomon-ncd-tfidf.json", buildResult("ncd-tfidf", ncdTfidfConfig, ncdTfidfResult));
 
 console.log("Generated segmentation results:");
-console.log(`  punctuation:  ${punctResult.length} segments`);
-console.log(`  compression:  ${compResult.length} segments`);
-console.log(`  tfidf:        ${tfidfResult.length} segments`);
-console.log(`  ncd-tfidf:    ${ncdTfidfResult.length} segments`);
+console.log(`  punctuation:  ${punctResult.length} segments, avg ${avgLength(punctResult)} chars`);
+console.log(`  compression:  ${compResult.length} segments, avg ${avgLength(compResult)} chars`);
+console.log(`  tfidf:        ${tfidfResult.length} segments, avg ${avgLength(tfidfResult)} chars`);
+console.log(`  ncd-tfidf:    ${ncdTfidfResult.length} segments, avg ${avgLength(ncdTfidfResult)} chars`);
