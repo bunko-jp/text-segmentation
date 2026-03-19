@@ -1,8 +1,21 @@
 {
-  "name": "text-segmentation",
+  "name": "@bunkojp/text-segmentation",
   "version": "0.1.0",
+  "description": "Split text into semantic or structural chunks using purely algorithmic strategies. Supports mixed Japanese/English text.",
   "license": "CC0-1.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bunko-jp/text-segmentation.git"
+  },
+  "keywords": [
+    "text-segmentation",
+    "chunking",
+    "ncd",
+    "tfidf",
+    "nlp",
+    "japanese"
+  ],
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",

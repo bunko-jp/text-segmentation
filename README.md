@@ -5,13 +5,13 @@ Split text into semantic or structural chunks using purely algorithmic strategie
 ## Install
 
 ```bash
-npm install text-segmentation
+npm install @bunkojp/text-segmentation
 ```
 
 ## Quick Start
 
 ```ts
-import { segmentByNcdTfidf } from "text-segmentation";
+import { segmentByNcdTfidf } from "@bunkojp/text-segmentation";
 
 const text = `Today the weather is nice. I went for a walk. I saw flowers in the park.
 
@@ -38,7 +38,7 @@ Four segmentation strategies are provided, listed from fastest/simplest to most 
 Accumulates sentences up to a target size and splits at sentence boundaries. The fastest strategy.
 
 ```ts
-import { segmentByPunctuation } from "text-segmentation";
+import { segmentByPunctuation } from "@bunkojp/text-segmentation";
 
 const segments = segmentByPunctuation(text, {
   targetChunkSize: 500,  // Target chunk size in characters
@@ -52,7 +52,7 @@ const segments = segmentByPunctuation(text, {
 Computes Normalized Compression Distance between adjacent sentence windows to detect semantic boundaries.
 
 ```ts
-import { segmentByCompression } from "text-segmentation";
+import { segmentByCompression } from "@bunkojp/text-segmentation";
 
 const segments = segmentByCompression(text, {
   targetChunkSize: 500,
@@ -70,7 +70,7 @@ const segments = segmentByCompression(text, {
 Uses TF-IDF cosine distance between adjacent sentence windows. Strong at detecting lexical topic shifts.
 
 ```ts
-import { segmentByTfidf } from "text-segmentation";
+import { segmentByTfidf } from "@bunkojp/text-segmentation";
 
 const segments = segmentByTfidf(text, {
   targetChunkSize: 500,
@@ -88,7 +88,7 @@ const segments = segmentByTfidf(text, {
 Weighted combination of compression distance and TF-IDF cosine distance. The most robust strategy.
 
 ```ts
-import { segmentByNcdTfidf } from "text-segmentation";
+import { segmentByNcdTfidf } from "@bunkojp/text-segmentation";
 
 const segments = segmentByNcdTfidf(text, {
   targetChunkSize: 500,
@@ -108,7 +108,7 @@ const segments = segmentByNcdTfidf(text, {
 All strategies provide an `AsyncGenerator`-based streaming API.
 
 ```ts
-import { streamSegmentByCompression } from "text-segmentation";
+import { streamSegmentByCompression } from "@bunkojp/text-segmentation";
 
 for await (const event of streamSegmentByCompression(text)) {
   if (event.type === "segment") {
@@ -137,7 +137,7 @@ Use `text.slice(segment.start, segment.end)` to extract segment text. All segmen
 The sentence splitter is also available as a standalone utility.
 
 ```ts
-import { splitIntoSentences } from "text-segmentation";
+import { splitIntoSentences } from "@bunkojp/text-segmentation";
 
 const sentences = splitIntoSentences("First sentence. Second sentence.");
 // [{ index: 1, text: "First sentence.", start: 0, end: 16 }, ...]
