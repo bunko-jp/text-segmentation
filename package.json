@@ -1,6 +1,6 @@
 {
   "name": "@bunkojp/text-segmentation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Split text into semantic or structural chunks using purely algorithmic strategies. Supports mixed Japanese/English text.",
   "license": "CC0-1.0",
   "type": "module",
