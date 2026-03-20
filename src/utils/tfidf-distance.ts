@@ -5,46 +5,14 @@
  * without external morphological analyzers.
  */
 
-// ============================================================
-// Tokenization
-// ============================================================
-
-const WORD_PATTERN = /[\p{L}\p{N}_-]+/gu;
-
-function normalizeText(text: string): string {
-  return text.toLowerCase().replace(/\s+/g, " ").trim();
-}
-
-function extractWordTokens(text: string): string[] {
-  const matches = text.match(WORD_PATTERN);
-  if (!matches) {
-    return [];
-  }
-  return matches.filter((token) => token.length >= 2);
-}
-
-function extractCharacterBigrams(text: string): string[] {
-  const compact = text.replace(/\s+/g, "");
-  if (compact.length < 2) {
-    return compact.length === 0 ? [] : [compact];
-  }
-
-  return Array.from({ length: compact.length - 1 }, (_, i) => compact.slice(i, i + 2));
-}
+import { tokenizeText } from "./tokenizer";
 
 /**
  * Tokenize text for TF-IDF vectorization.
+ * @deprecated Use {@link tokenizeText} from "./tokenizer" instead.
  */
 export function tokenizeTextForTfidf(text: string): string[] {
-  const normalized = normalizeText(text);
-  if (!normalized) {
-    return [];
-  }
-
-  const words = extractWordTokens(normalized);
-  const bigrams = extractCharacterBigrams(normalized);
-
-  return words.length === 0 ? bigrams : [...words, ...bigrams];
+  return tokenizeText(text);
 }
 
 // ============================================================
@@ -134,7 +102,7 @@ export function calculateAdjacentTfidfDistance(texts: string[]): number[] {
     return [];
   }
 
-  const tokenized = texts.map((text) => tokenizeTextForTfidf(text));
+  const tokenized = texts.map((text) => tokenizeText(text));
   const documentFrequency = buildDocumentFrequency(tokenized);
   const totalDocs = tokenized.length;
   const vectors = tokenized.map((tokens) => buildTfidfVector(tokens, documentFrequency, totalDocs));

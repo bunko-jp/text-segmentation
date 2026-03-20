@@ -11,6 +11,7 @@ import { segmentByPunctuation } from "../../src/strategies/punctuation";
 import { segmentByCompression } from "../../src/strategies/compression";
 import { segmentByTfidf } from "../../src/strategies/tfidf";
 import { segmentByNcdTfidf } from "../../src/strategies/ncd-tfidf";
+import { segmentByBayes } from "../../src/strategies/bayes";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const rashomonText = readFileSync(resolve(currentDir, "rashomon.txt"), "utf-8");
@@ -88,14 +89,21 @@ const ncdTfidfConfig = { ...semanticBase, adaptive: true, ncdTfidfPercentile: 0.
 const ncdTfidfResult = segmentByNcdTfidf(rashomonText, ncdTfidfConfig);
 writeResult("rashomon-ncd-tfidf.json", buildResult("ncd-tfidf", ncdTfidfConfig, ncdTfidfResult));
 
+// Bayes (n-gram JSD)
+const bayesConfig = { ...semanticBase, adaptive: true, bayesPercentile: 0.25, windowSize: 3 };
+const bayesResult = segmentByBayes(rashomonText, bayesConfig);
+writeResult("rashomon-bayes.json", buildResult("bayes", bayesConfig, bayesResult));
+
 console.log("Generated segmentation results:");
 console.log(`  punctuation:  ${punctResult.length} segments, avg ${avgLength(punctResult)} chars`);
 console.log(`  compression:  ${compResult.length} segments, avg ${avgLength(compResult)} chars`);
 console.log(`  tfidf:        ${tfidfResult.length} segments, avg ${avgLength(tfidfResult)} chars`);
 console.log(`  ncd-tfidf:    ${ncdTfidfResult.length} segments, avg ${avgLength(ncdTfidfResult)} chars`);
+console.log(`  bayes:        ${bayesResult.length} segments, avg ${avgLength(bayesResult)} chars`);
 
 console.log("\nBoundary positions (end):");
 console.log(`  punctuation:  ${punctResult.map((p) => p.end).join(", ")}`);
 console.log(`  compression:  ${compResult.map((p) => p.end).join(", ")}`);
 console.log(`  tfidf:        ${tfidfResult.map((p) => p.end).join(", ")}`);
 console.log(`  ncd-tfidf:    ${ncdTfidfResult.map((p) => p.end).join(", ")}`);
+console.log(`  bayes:        ${bayesResult.map((p) => p.end).join(", ")}`);

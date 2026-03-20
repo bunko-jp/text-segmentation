@@ -9,6 +9,7 @@
  * - Compression Strategy: Uses NCD for semantic boundary detection without API calls
  * - TF-IDF Strategy: Uses lexical divergence for semantic boundary detection
  * - NCD+TF-IDF Strategy: Uses combined divergence from both methods
+ * - Bayes Strategy: Uses n-gram JSD with optional prior weighting
  */
 
 // ============================================================
@@ -98,3 +99,15 @@ export {
   streamSegmentByNcdTfidf,
   type NcdTfidfSegmenterConfig,
 } from "./strategies/ncd-tfidf";
+
+// ============================================================
+// Bayesian n-gram divergence Strategy
+// ============================================================
+
+export {
+  segmentByBayes,
+  streamSegmentByBayes,
+  type BayesSegmenterConfig,
+} from "./strategies/bayes";
+
+export type { NgramPrior } from "./utils/bayes-divergence";
